@@ -11,7 +11,7 @@ namespace R5T.L0040.T000
     /// <summary>
     /// .NET project context.
     /// </summary>
-    [ContextTypeMarker]
+    [ContextDefinitionMarker]
     public interface IProjectContext : IContextDefinitionMarker,
         ITextOutputtedContext
     {

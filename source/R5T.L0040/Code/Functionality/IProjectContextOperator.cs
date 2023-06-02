@@ -1,8 +1,7 @@
 using System;
-using System.Net.Http.Headers;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using R5T.L0040.T000;
 using R5T.T0132;
 using R5T.T0159;
 using R5T.T0172;
@@ -10,29 +9,15 @@ using R5T.T0172.Extensions;
 using R5T.T0187;
 using R5T.T0187.Extensions;
 
+using R5T.L0040.T000;
+
 
 namespace R5T.L0040
 {
     [FunctionalityMarker]
-    public partial interface IProjectContextOperator : IFunctionalityMarker
+    public partial interface IProjectContextOperator : IFunctionalityMarker,
+        F000.IProjectContextOperator
     {
-        public async Task In_ProjectContext(
-            IProjectFilePath projectFilePath,
-            IProjectName projectName,
-            ITextOutput textOutput,
-            params Func<IProjectContext, Task>[] operations)
-        {
-            await Instances.ContextOperator.In_Context(
-                () => new ProjectContext
-                {
-                    ProjectFilePath = projectFilePath,
-                    ProjectName = projectName,
-                    TextOutput = textOutput,
-                },
-                operations,
-                Instances.ActionOperations.DoNothing_Synchronous);
-        }
-
         /// <summary>
         /// Because this is a 'new' method, it will throw an exception if the project file already exists.
         /// </summary>

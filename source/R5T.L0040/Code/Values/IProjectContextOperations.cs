@@ -24,6 +24,41 @@ namespace R5T.L0040
         /// Simply adds project file references to a project.
         /// </summary>
         public Func<IProjectContext, Task> Add_ProjectFileReferences(
+            IEnumerable<IProjectFilePath> projectFilePaths)
+        {
+            // Evaluate the enumerable now.
+            var projectFileReferenceValues = projectFilePaths
+                .Select(x => x.Value)
+                .Now();
+
+            return projectContext =>
+            {
+                Instances.ProjectFileOperator.AddProjectReferences_Idempotent_Synchronous(
+                    projectContext.ProjectFilePath.Value,
+                    projectFileReferenceValues);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        public Func<IProjectContext, Task> Add_ProjectFileReferences(
+            params IProjectFilePath[] projectFilePaths)
+        {
+            return this.Add_ProjectFileReferences(
+                projectFilePaths.AsEnumerable());
+        }
+
+        public Func<IProjectContext, Task> Add_ProjectFileReference(
+            IProjectFilePath projectFilePath)
+        {
+            return this.Add_ProjectFileReferences(
+                projectFilePath);
+        }
+
+        /// <summary>
+        /// Simply adds project file references to a project.
+        /// </summary>
+        public Func<IProjectContext, Task> Add_ProjectFileReferences(
             IEnumerable<IProjectFileReference> projectFileReferences)
         {
             // Evaluate the enumerable now.
@@ -71,35 +106,31 @@ namespace R5T.L0040
                 projectFileReferences.AsEnumerable());
         }
 
-        public delegate Func<IProjectContext, Task> In_New_ProjectFileContext_Params(
-            params Func<IProjectFileContext, Task>[] operations);
-
         /// <inheritdoc cref="L0033.IProjectFileContextOperator.In_New_ProjectFileContext(IProjectFilePath, IEnumerable{Func{IProjectFileContext, Task}})"/>
-        public In_New_ProjectFileContext_Params In_New_ProjectFileContext =>
-            operations =>
+        public Func<IProjectContext, Task> In_New_ProjectFileContext(
+            params Func<IProjectFileContext, Task>[] operations)
+            =>
                 context => Instances.ProjectFileContextOperator.In_New_ProjectFileContext(
                 context.ProjectFilePath,
                 operations);
 
-        public delegate Func<IProjectContext, Task> In_New_ProjectFileContext_Params_Action(
-            params Action<IProjectFileContext>[] operations);
-
-        public In_New_ProjectFileContext_Params_Action In_New_ProjectFileContext_Action =>
-            operations =>
+        public Func<IProjectContext, Task> In_New_ProjectFileContext_Action(
+            params Action<IProjectFileContext>[] operations)
+            =>
                 context => Instances.ProjectFileContextOperator.In_New_ProjectFileContext_Task(
                 context.ProjectFilePath,
                 operations);
 
         public Func<IProjectContext, Task> Create_New_Project(
             ISolutionContext solutionContext,
-            Func<IProjectFileContext, Task> createNewProjectFileOperation,
-            Func<IProjectContext, Task> createNewProjectOperation,
+            Func<IProjectFileContext, Task> setupProjectFileOperation,
+            Func<IProjectContext, Task> setupProjectOperation,
             Func<IProjectFilePath, Task> projectFilePathHandler)
         {
             return projectContext => projectContext.Run(
                 this.In_New_ProjectFileContext(
-                    createNewProjectFileOperation),
-                createNewProjectOperation,
+                    setupProjectFileOperation),
+                setupProjectOperation,
                 projectContext => projectFilePathHandler(projectContext.ProjectFilePath),
                 this.Add_ToSolution(
                     solutionContext.SolutionFilePath)
@@ -108,14 +139,14 @@ namespace R5T.L0040
 
         public Func<IProjectContext, Task> Create_New_Project(
             ISolutionContext solutionContext,
-            Func<IProjectFileContext, Task> createNewProjectFileOperation,
-            Func<IProjectContext, Task> createNewProjectOperation,
+            Func<IProjectFileContext, Task> setupProjectFileOperation,
+            Func<IProjectContext, Task> setupProjectOperation,
             IHasProjectFilePath hasProjectFilePath)
         {
             return this.Create_New_Project(
                 solutionContext,
-                createNewProjectFileOperation,
-                createNewProjectOperation,
+                setupProjectFileOperation,
+                setupProjectOperation,
                 projectFilePath =>
                 {
                     hasProjectFilePath.ProjectFilePath = projectFilePath;
@@ -124,15 +155,19 @@ namespace R5T.L0040
                 });
         }
 
+        /// <summary>
+        /// Creates a new project file using the provided creation operation, then sets up the new project using the provided setup operation.
+        /// <inheritdoc cref="In_New_ProjectFileContext(Func{IProjectFileContext, Task}[])"/>
+        /// </summary>
         public Func<IProjectContext, Task> Create_New_Project(
-            Func<IProjectFileContext, Task> createNewProjectFileOperation,
-            Func<IProjectFilePath, Task> projectFilePathHandler,
-            Func<IProjectContext, Task> createNewProjectOperation)
+            Func<IProjectFileContext, Task> setupProjectFileOperation,
+            Func<IProjectContext, Task> setupProjectOperation,
+            Func<IProjectFilePath, Task> projectFilePathHandler)
         {
             return projectContext => projectContext.Run(
                 this.In_New_ProjectFileContext(
-                    createNewProjectFileOperation),
-                createNewProjectOperation,
+                    setupProjectFileOperation),
+                setupProjectOperation,
                 projectContext => projectFilePathHandler(projectContext.ProjectFilePath)
             );
         }
@@ -141,14 +176,14 @@ namespace R5T.L0040
         /// Because the is a 'new' method, it will throw if the project file already exists.
         /// </summary>
         public Func<IProjectContext, Task> Create_New_Project(
-            Func<IProjectFileContext, Task> createNewProjectFileOperation,
-            IHasProjectFilePath hasProjectFilePath,
-            Func<IProjectContext, Task> createNewProjectOperation)
+            Func<IProjectFileContext, Task> setupProjectFileOperation,
+            Func<IProjectContext, Task> setupProjectOperation,
+            IHasProjectFilePath hasProjectFilePath)
         {
             return projectContext => projectContext.Run(
                 // Create the project file.
                 this.In_New_ProjectFileContext(
-                    createNewProjectFileOperation),
+                    setupProjectFileOperation),
                 // Handle the project file path.
                 projectContext =>
                 {
@@ -157,7 +192,7 @@ namespace R5T.L0040
                     return Task.CompletedTask;
                 },
                 // Create the project.
-                createNewProjectOperation
+                setupProjectOperation
             );
         }
 
@@ -166,7 +201,7 @@ namespace R5T.L0040
         /// </summary>
         public Func<IProjectContext, Task> Add_ToSolution(
             ISolutionFilePath solutionFilePath,
-            bool addRecursiveProjectReferences = true)
+            bool addRecursiveProjectReferences = F0063.IValues.Default_AddRecursiveProjectReferences_Constant)
         {
             Task Internal(IProjectContext context)
             {
@@ -184,127 +219,74 @@ namespace R5T.L0040
             }
 
             return Internal;
-        }
-
-        public Func<IProjectContext, Task> Create_ProjectPlanFile(
-            IProjectName projectName,
-            IProjectDescription projectDescription)
-        {
-            return context =>
-            {
-                var projectPlanFilePath = Instances.ProjectPathsOperator.GetProjectPlanMarkdownFilePath(
-                    context.ProjectFilePath.Value);
-
-                Instances.TextFileGenerator.CreateProjectPlanMarkdownFile(
-                    projectPlanFilePath,
-                    projectName.Value,
-                    projectDescription.Value);
-
-                return Task.CompletedTask;
-            };
-        }
-
-        public Func<IProjectContext, Task> Create_InstancesFile(
-            INamespaceName projectNamespaceName)
-        {
-            return context =>
-            {
-                var instanceFilePath = Instances.ProjectPathsOperator.GetInstancesFilePath(
-                    context.ProjectFilePath.Value);
-
-                Instances.CodeFileGenerator.CreateInstancesFile(
-                    instanceFilePath,
-                    projectNamespaceName.Value);
-
-                return Task.CompletedTask;
-            };
-        }
-
-        public Func<IProjectContext, Task> Create_DocumentationFile(
-            INamespaceName projectNamespaceName,
-            IProjectDescription projectDescription)
-        {
-            return context =>
-            {
-                var documentationFilePath = Instances.ProjectPathsOperator.GetDocumentationFilePath(
-                    context.ProjectFilePath.Value);
-
-                Instances.CodeFileGenerator.CreateDocumentationFile(
-                    documentationFilePath,
-                    projectNamespaceName.Value,
-                    projectDescription.Value);
-
-                return Task.CompletedTask;
-            };
-        }
+        }        
 
         /// <summary>
-        /// The default console project creation operation.
-        /// Does not create the project file, just the project's files.
+        /// The default console project setup operation.
+        /// Does not create the project file, just sets up the project's files.
         /// </summary>
         /// <returns></returns>
-        public Func<IProjectContext, Task> Create_ConsoleProject(
-            IProjectName projectName,
+        public Func<IProjectContext, Task> Setup_ConsoleProject(
             IProjectDescription projectDescription,
             INamespaceName projectNamespaceName)
         {
             return projectContext =>
             {
-                projectContext.Run(
-                    this.Create_ProjectPlanFile(
-                projectName,
-                        projectDescription),
-                    this.Create_InstancesFile(
-                        projectNamespaceName),
-                    this.Create_DocumentationFile(
-                        projectNamespaceName,
-                        projectDescription),
-                    Create_ProgramFile
-                );
+                return Instances.ProjectContextOperator_Internal.Setup_ConsoleProject(
+                    projectContext,
+                    projectDescription,
+                    projectNamespaceName);
+            };
+        }
 
-                Task Create_ProgramFile(
-                    IProjectContext _)
-                {
-                    var programFilePath = Instances.ProjectPathsOperator.GetProgramFilePath(
-                        projectContext.ProjectFilePath.Value);
+        public Func<IProjectContext, Task> Setup_WebServerForBlazorClient(
+            IProjectDescription projectDescription)
+        {
+            return projectContext =>
+            {
+                return Instances.ProjectContextOperator_Internal.Setup_WebServerForBlazorClient(
+                    projectContext,
+                    projectDescription);
+            };
+        }
 
-                    Instances.CodeFileGenerator.CreateProgramFile(
-                        programFilePath,
-                        projectNamespaceName.Value);
-
-                    return Task.CompletedTask;
-                }
-
-                return Task.CompletedTask;
+        public Func<IProjectContext, Task> Setup_ConsoleProject(
+            IProjectDescription projectDescription)
+        {
+            return projectContext =>
+            {
+                return Instances.ProjectContextOperator_Internal.Setup_ConsoleProject(
+                    projectContext,
+                    projectDescription);
             };
         }
 
         /// <summary>
-        /// The default library project creation operation.
-        /// Does not create the project file, just the project's files.
+        /// The default library project setup operation.
+        /// Does not create the project file, just sets up the project's files.
         /// </summary>
         /// <returns></returns>
-        public Func<IProjectContext, Task> Create_LibraryProject(
-            IProjectName projectName,
+        public Func<IProjectContext, Task> Setup_LibraryProject(
             IProjectDescription projectDescription,
             INamespaceName projectNamespaceName)
         {
             return projectContext =>
             {
-                projectContext.Run(
-                    this.Create_ProjectPlanFile(
-                        projectName,
-                        projectDescription),
-                    this.Create_InstancesFile(
-                        projectNamespaceName),
-                    this.Create_DocumentationFile(
-                        projectNamespaceName,
-                        projectDescription),
-                    this.Add_ProjectFileReferences(
-                        Instances.ProjectFileReferences.For_NET_6_FoundationLibrary)
-                );
+                return Instances.ProjectContextOperator_Internal.Setup_LibraryProject(
+                    projectContext,
+                    projectDescription,
+                    projectNamespaceName);
+            };
+        }
 
-                return Task.CompletedTask;
+        public Func<IProjectContext, Task> Setup_LibraryProject(
+           IProjectDescription projectDescription)
+        {
+            return projectContext =>
+            {
+                return Instances.ProjectContextOperator_Internal.Setup_LibraryProject(
+                    projectContext,
+                    projectDescription);
             };
         }
 

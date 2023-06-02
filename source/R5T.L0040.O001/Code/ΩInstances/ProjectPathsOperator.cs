@@ -1,7 +1,7 @@
 using System;
 
 
-namespace R5T.L0040
+namespace R5T.L0040.O001
 {
     public class ProjectPathsOperator : IProjectPathsOperator
     {
