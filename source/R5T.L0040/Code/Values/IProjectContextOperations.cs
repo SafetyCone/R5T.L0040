@@ -18,7 +18,8 @@ using R5T.L0040.T000;
 namespace R5T.L0040
 {
     [ValuesMarker]
-    public partial interface IProjectContextOperations : IValuesMarker
+    public partial interface IProjectContextOperations : IValuesMarker,
+        O002.IProjectContextOperations
     {
         /// <summary>
         /// Simply adds project file references to a project.
@@ -236,6 +237,17 @@ namespace R5T.L0040
                     projectContext,
                     projectDescription,
                     projectNamespaceName);
+            };
+        }
+
+        public Func<IProjectContext, Task> Setup_BlazorClient(
+            IProjectDescription projectDescription)
+        {
+            return projectContext =>
+            {
+                return Instances.ProjectContextOperator_Internal.Setup_BlazorClient(
+                    projectContext,
+                    projectDescription);
             };
         }
 

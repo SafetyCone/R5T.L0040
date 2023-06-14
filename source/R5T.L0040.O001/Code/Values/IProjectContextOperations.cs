@@ -15,6 +15,21 @@ namespace R5T.L0040.O001
     [ValuesMarker]
     public partial interface IProjectContextOperations : IValuesMarker
     {
+        public Func<IProjectContext, Task> Create_AppRazorFile()
+        {
+            return projectContext =>
+            {
+                var razorFilePath = Instances.ProjectPathsOperator.GetAppRazorFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToRazorFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_AppRazorFile_WebBlazorClient(
+                    razorFilePath);
+
+                return Task.CompletedTask;
+            };
+        }
+
         public Func<IProjectContext, Task> Create_AppSettingsJsonFile()
         {
             return context =>
@@ -62,6 +77,91 @@ namespace R5T.L0040.O001
             };
         }
 
+        public Func<IProjectContext, Task> Create_IndexRazorFile()
+        {
+            return projectContext =>
+            {
+                var razorFilePath = Instances.ProjectPathsOperator.GetIndexRazorFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToRazorFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_IndexRazorFile_WebBlazorClient(
+                    razorFilePath);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        public Func<IProjectContext, Task> Create_MainLayoutRazorFile(
+            INamespaceName projectNamespaceName)
+        {
+            return projectContext =>
+            {
+                var razorFilePath = Instances.ProjectPathsOperator.GetMainLayoutRazorFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToRazorFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_MainLayoutRazorFile_WebBlazorClient(
+                    razorFilePath,
+                    projectNamespaceName);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        public Func<IProjectContext, Task> Create_ImportsRazorFile(
+            INamespaceName projectNamespaceName)
+        {
+            return projectContext =>
+            {
+                var razorFilePath = Instances.ProjectPathsOperator.GetMainImportsRazorFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToRazorFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_ImportsRazorFile_WebBlazorClient_Main(
+                    razorFilePath,
+                    projectNamespaceName);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        public Func<IProjectContext, Task> Create_IndexHtmlFile(
+            string pageTitle)
+        {
+            return projectContext =>
+            {
+                var htmlFilePath = Instances.ProjectPathsOperator.GetWwwRootIndexHtmlFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToHtmlFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_IndexHtmlFile(
+                    htmlFilePath,
+                    pageTitle);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        /// <summary>
+        /// Uses the project name as the index page title.
+        /// </summary>
+        public Func<IProjectContext, Task> Create_IndexHtmlFile()
+        {
+            return projectContext =>
+            {
+                var htmlFilePath = Instances.ProjectPathsOperator.GetWwwRootIndexHtmlFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToHtmlFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_IndexHtmlFile(
+                    htmlFilePath,
+                    projectContext.ProjectName.Value);
+
+                return Task.CompletedTask;
+            };
+        }
+
         public Func<IProjectContext, Task> Create_InstancesFile(
             INamespaceName projectNamespaceName)
         {
@@ -90,6 +190,43 @@ namespace R5T.L0040.O001
                 Instances.CodeFileGenerationOperations.Create_LaunchSettingsJsonFile_WebServerForBlazorClient(
                     programFilePath,
                     projectContext.ProjectName);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        public Func<IProjectContext, Task> Create_PackageJsonFile(
+            IProjectName projectName,
+            IProjectDescription projectDescription,
+            INamespaceName projectNamespaceName)
+        {
+            return projectContext =>
+            {
+                var jsonFilePath = Instances.ProjectPathsOperator.GetPackageJsonFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToJsonFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_PackageJsonFile(
+                    jsonFilePath,
+                    projectName,
+                    projectDescription);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        public Func<IProjectContext, Task> Create_ProgramFile_BlazorClient(
+            INamespaceName projectNamespaceName)
+        {
+            return projectContext =>
+            {
+                var programFilePath = Instances.ProjectPathsOperator.GetProgramFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToCSharpFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_ProgramFile_WebBlazorClient(
+                    programFilePath,
+                    projectNamespaceName);
 
                 return Task.CompletedTask;
             };
@@ -143,6 +280,66 @@ namespace R5T.L0040.O001
                     projectPlanFilePath,
                     projectName,
                     projectDescription);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        public Func<IProjectContext, Task> Create_TailwindConfigJsFile()
+        {
+            return projectContext =>
+            {
+                var jsFilePath = Instances.ProjectPathsOperator.GetTailwindConfigJsFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToJsFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_TailwindConfigJsFile(
+                    jsFilePath);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        public Func<IProjectContext, Task> Create_TailwindAllContentPathsJsonFile()
+        {
+            return projectContext =>
+            {
+                var jsonFilePath = Instances.ProjectPathsOperator.GetTailwindAllContentPathsJsonFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToJsonFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_TailwindCssAllContentPathsJsonFile(
+                    jsonFilePath);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        public Func<IProjectContext, Task> Create_TailwindContentPathsJsonFile()
+        {
+            return projectContext =>
+            {
+                var jsonFilePath = Instances.ProjectPathsOperator.GetTailwindContentPathsJsonFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToJsonFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_TailwindCssContentPathsJsonFile(
+                    jsonFilePath);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        public Func<IProjectContext, Task> Create_TailwindCssFile()
+        {
+            return projectContext =>
+            {
+                var cssFilePath = Instances.ProjectPathsOperator.GetTailwindCssFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToCssFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_TailwindCssFile(
+                    cssFilePath);
 
                 return Task.CompletedTask;
             };

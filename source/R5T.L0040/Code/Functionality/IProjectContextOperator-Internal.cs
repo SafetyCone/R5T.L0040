@@ -13,6 +13,44 @@ namespace R5T.L0040.Internal
     [FunctionalityMarker]
     public partial interface IProjectContextOperator : IFunctionalityMarker
     {
+        public Task Setup_BlazorClient(
+            IProjectContext projectContext,
+            IProjectDescription projectDescription)
+        {
+            var projectNamespaceName = Instances.ProjectNamespaceNamesOperator.Get_DefaultProjectNamespaceName(
+                projectContext.ProjectName);
+
+            return projectContext.Run(
+                Instances.ProjectContextOperations_FileGeneration.Create_ProjectPlanFile(
+                    projectContext.ProjectName,
+                    projectDescription),
+                Instances.ProjectContextOperations_FileGeneration.Create_InstancesFile(
+                    projectNamespaceName),
+                Instances.ProjectContextOperations_FileGeneration.Create_DocumentationFile(
+                    projectDescription,
+                    projectNamespaceName),
+                Instances.ProjectContextOperations_FileGeneration.Create_ProgramFile_BlazorClient(
+                    projectNamespaceName),
+                Instances.ProjectContextOperations_FileGeneration.Create_LaunchSettingsJsonFile_WebServerForBlazorClient(),
+                Instances.ProjectContextOperations_FileGeneration.Create_PackageJsonFile(
+                    projectContext.ProjectName,
+                    projectDescription,
+                    projectNamespaceName),
+                Instances.ProjectContextOperations_FileGeneration.Create_TailwindConfigJsFile(),
+                Instances.ProjectContextOperations_FileGeneration.Create_TailwindCssFile(),
+                Instances.ProjectContextOperations_FileGeneration.Create_IndexHtmlFile(),
+                Instances.ProjectContextOperations_FileGeneration.Create_AppRazorFile(),
+                Instances.ProjectContextOperations_FileGeneration.Create_ImportsRazorFile(
+                    projectNamespaceName),
+                Instances.ProjectContextOperations_FileGeneration.Create_MainLayoutRazorFile(
+                    projectNamespaceName),
+                Instances.ProjectContextOperations_FileGeneration.Create_IndexRazorFile(),
+                Instances.ProjectContextOperations_FileGeneration.Create_TailwindContentPathsJsonFile(),
+                Instances.ProjectContextOperations_FileGeneration.Create_TailwindAllContentPathsJsonFile(),
+                Instances.ProjectContextOperations.Run_NpmInstall()
+            );
+        }
+
         public Task Setup_WebServerForBlazorClient(
             IProjectContext projectContext,
             IProjectDescription projectDescription)

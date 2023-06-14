@@ -2,20 +2,21 @@
   <PropertyGroup Label="Main">
     <TargetFramework>net6.0</TargetFramework>
     <OutputType>Library</OutputType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>1573;1587;1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Label="Package">
     <Version>1.0.0</Version>
     <Authors>DCoats</Authors>
     <Company>Rivet</Company>
     <Copyright>Copyright © Rivet 2023</Copyright>
-    <Description>Context types library for the project context operations library.</Description>
+    <Description>External executable project context operations.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\R5T.L0035\source\R5T.L0035\R5T.L0035.csproj" />
-    <ProjectReference Include="..\..\..\R5T.T0172\source\R5T.T0172\R5T.T0172.csproj" />
-    <ProjectReference Include="..\..\..\R5T.T0187\source\R5T.T0187\R5T.T0187.csproj" />
-    <ProjectReference Include="..\..\..\R5T.T0194\source\R5T.T0194\R5T.T0194.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0129\source\R5T.F0129\R5T.F0129.csproj" />
+    <ProjectReference Include="..\R5T.L0040.T000\R5T.L0040.T000.csproj" />
+    <ProjectReference Include="..\..\..\R5T.F0078\source\R5T.F0078\R5T.F0078.csproj" />
   </ItemGroup>
 </Project>
