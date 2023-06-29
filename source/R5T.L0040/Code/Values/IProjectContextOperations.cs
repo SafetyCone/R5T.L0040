@@ -112,8 +112,8 @@ namespace R5T.L0040
             params Func<IProjectFileContext, Task>[] operations)
             =>
                 context => Instances.ProjectFileContextOperator.In_New_ProjectFileContext(
-                context.ProjectFilePath,
-                operations);
+                    context.ProjectFilePath,
+                    operations);
 
         public Func<IProjectContext, Task> In_New_ProjectFileContext_Action(
             params Action<IProjectFileContext>[] operations)
@@ -126,13 +126,16 @@ namespace R5T.L0040
             ISolutionContext solutionContext,
             Func<IProjectFileContext, Task> setupProjectFileOperation,
             Func<IProjectContext, Task> setupProjectOperation,
-            Func<IProjectFilePath, Task> projectFilePathHandler)
+            Func<IProjectFilePath, Task> projectFilePathHandler = default)
         {
             return projectContext => projectContext.Run(
                 this.In_New_ProjectFileContext(
                     setupProjectFileOperation),
                 setupProjectOperation,
-                projectContext => projectFilePathHandler(projectContext.ProjectFilePath),
+                projectContext => Instances.ActionOperator.Run(
+                    projectFilePathHandler,
+                    projectContext.ProjectFilePath
+                ),
                 this.Add_ToSolution(
                     solutionContext.SolutionFilePath)
             );
@@ -163,13 +166,16 @@ namespace R5T.L0040
         public Func<IProjectContext, Task> Create_New_Project(
             Func<IProjectFileContext, Task> setupProjectFileOperation,
             Func<IProjectContext, Task> setupProjectOperation,
-            Func<IProjectFilePath, Task> projectFilePathHandler)
+            Func<IProjectFilePath, Task> projectFilePathHandler = default)
         {
             return projectContext => projectContext.Run(
                 this.In_New_ProjectFileContext(
                     setupProjectFileOperation),
                 setupProjectOperation,
-                projectContext => projectFilePathHandler(projectContext.ProjectFilePath)
+                projectContext => Instances.ActionOperator.Run(
+                    projectFilePathHandler,
+                    projectContext.ProjectFilePath
+                )
             );
         }
 
@@ -246,6 +252,17 @@ namespace R5T.L0040
             return projectContext =>
             {
                 return Instances.ProjectContextOperator_Internal.Setup_BlazorClient(
+                    projectContext,
+                    projectDescription);
+            };
+        }
+
+        public Func<IProjectContext, Task> Setup_RazorClassLibrary(
+            IProjectDescription projectDescription)
+        {
+            return projectContext =>
+            {
+                return Instances.ProjectContextOperator_Internal.Setup_RazorClassLibrary(
                     projectContext,
                     projectDescription);
             };

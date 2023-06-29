@@ -6,6 +6,7 @@ namespace R5T.L0040
     public static class Instances
     {
         public static F0000.IActionOperations ActionOperations => F0000.ActionOperations.Instance;
+        public static F0000.IActionOperator ActionOperator => F0000.ActionOperator.Instance;
         public static F0053.ICodeFileGenerator CodeFileGenerator => F0053.CodeFileGenerator.Instance;
         public static L0031.IContextOperator ContextOperator => L0031.ContextOperator.Instance;
         public static F0000.IFileSystemOperator FileSystemOperator => F0000.FileSystemOperator.Instance;

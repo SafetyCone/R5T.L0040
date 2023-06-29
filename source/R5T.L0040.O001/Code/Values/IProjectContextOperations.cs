@@ -195,6 +195,34 @@ namespace R5T.L0040.O001
             };
         }
 
+        public Func<IProjectContext, Task> Create_ExampleComponent(
+            INamespaceName projectNamespaceName)
+        {
+            return async projectContext =>
+            {
+                var exampleComponentFilePath = Instances.ProjectPathsOperator.GetExampleComponentRazorFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToRazorFilePath();
+
+                await Instances.CodeFileGenerationOperations.Create_ExampleComponentRazorFile(
+                    exampleComponentFilePath,
+                    projectNamespaceName);
+            };
+        }
+
+        public Func<IProjectContext, Task> Create_PlaceholderHtmlFile()
+        {
+            return async projectContext =>
+            {
+                var placeholderHtmlFilePath = Instances.ProjectPathsOperator.Get_PlaceholderHtmlFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToHtmlFilePath();
+
+                await Instances.CodeFileGenerationOperations.Create_PlaceholderHtmlFile(
+                    placeholderHtmlFilePath);
+            };
+        }
+
         public Func<IProjectContext, Task> Create_PackageJsonFile(
             IProjectName projectName,
             IProjectDescription projectDescription,

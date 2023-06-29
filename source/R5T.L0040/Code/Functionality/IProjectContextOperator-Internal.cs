@@ -13,6 +13,29 @@ namespace R5T.L0040.Internal
     [FunctionalityMarker]
     public partial interface IProjectContextOperator : IFunctionalityMarker
     {
+        public Task Setup_RazorClassLibrary(
+            IProjectContext projectContext,
+            IProjectDescription projectDescription)
+        {
+            var projectNamespaceName = Instances.ProjectNamespaceNamesOperator.Get_DefaultProjectNamespaceName(
+                projectContext.ProjectName);
+
+            return projectContext.Run(
+                 Instances.ProjectContextOperations_FileGeneration.Create_ProjectPlanFile(
+                    projectContext.ProjectName,
+                    projectDescription),
+                Instances.ProjectContextOperations_FileGeneration.Create_InstancesFile(
+                    projectNamespaceName),
+                Instances.ProjectContextOperations_FileGeneration.Create_DocumentationFile(
+                    projectDescription,
+                    projectNamespaceName),
+                Instances.ProjectContextOperations_FileGeneration.Create_ExampleComponent(
+                    projectNamespaceName),
+                Instances.ProjectContextOperations_FileGeneration.Create_PlaceholderHtmlFile(),
+                Instances.ProjectContextOperations_FileGeneration.Create_TailwindContentPathsJsonFile()
+            );
+        }
+
         public Task Setup_BlazorClient(
             IProjectContext projectContext,
             IProjectDescription projectDescription)
