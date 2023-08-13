@@ -13,9 +13,9 @@ namespace R5T.L0040.T000
     /// </summary>
     [ContextDefinitionMarker]
     public interface IProjectContext : IContextDefinitionMarker,
+        IHasProjectFilePath,
+        IHasProjectName,
         ITextOutputtedContext
     {
-        public IProjectName ProjectName { get; }
-        public IProjectFilePath ProjectFilePath { get; }
     }
 }

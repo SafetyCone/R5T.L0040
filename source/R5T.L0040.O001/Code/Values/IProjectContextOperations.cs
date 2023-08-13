@@ -15,7 +15,7 @@ namespace R5T.L0040.O001
     [ValuesMarker]
     public partial interface IProjectContextOperations : IValuesMarker
     {
-        public Func<IProjectContext, Task> Create_AppRazorFile()
+        public Func<IProjectContext, Task> Create_AppRazorFile_WebBlazorClient()
         {
             return projectContext =>
             {
@@ -77,7 +77,8 @@ namespace R5T.L0040.O001
             };
         }
 
-        public Func<IProjectContext, Task> Create_IndexRazorFile()
+        public Func<IProjectContext, Task> Create_IndexRazorFile(
+            INamespaceName projectNamespaceName)
         {
             return projectContext =>
             {
@@ -86,7 +87,8 @@ namespace R5T.L0040.O001
                     .ToRazorFilePath();
 
                 Instances.CodeFileGenerationOperations.Create_IndexRazorFile_WebBlazorClient(
-                    razorFilePath);
+                    razorFilePath,
+                    projectNamespaceName);
 
                 return Task.CompletedTask;
             };
@@ -109,6 +111,38 @@ namespace R5T.L0040.O001
             };
         }
 
+        public Func<IProjectContext, Task> Create_ComponentsLayoutsLayoutRazorFile()
+        {
+            return projectContext =>
+            {
+                var razorFilePath = Instances.ProjectPathsOperator.Get_ComponentsLayoutsLayoutRazorFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToRazorFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_ComponentsLayoutsLayoutRazorFile_WebBlazorClient(
+                    razorFilePath);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        public Func<IProjectContext, Task> Create_ComponentsLayoutsLayoutClassFile(
+            INamespaceName projectNamespaceName)
+        {
+            return projectContext =>
+            {
+                var razorFilePath = Instances.ProjectPathsOperator.Get_ComponentsLayoutsLayoutCodeFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToRazorFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_ComponentsLayoutsLayoutCodeFile_WebBlazorClient(
+                    razorFilePath,
+                    projectNamespaceName);
+
+                return Task.CompletedTask;
+            };
+        }
+
         public Func<IProjectContext, Task> Create_ImportsRazorFile(
             INamespaceName projectNamespaceName)
         {
@@ -119,6 +153,57 @@ namespace R5T.L0040.O001
                     .ToRazorFilePath();
 
                 Instances.CodeFileGenerationOperations.Create_ImportsRazorFile_WebBlazorClient_Main(
+                    razorFilePath,
+                    projectNamespaceName);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        public Func<IProjectContext, Task> Create_PagesImportsRazorFile(
+            INamespaceName projectNamespaceName)
+        {
+            return projectContext =>
+            {
+                var razorFilePath = Instances.ProjectPathsOperator.Get_PagesImportsRazorFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToRazorFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_ImportsRazorFile_WebBlazorClient_Pages(
+                    razorFilePath,
+                    projectNamespaceName);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        public Func<IProjectContext, Task> Create_ComponentsImportsRazorFile(
+            INamespaceName projectNamespaceName)
+        {
+            return projectContext =>
+            {
+                var razorFilePath = Instances.ProjectPathsOperator.Get_ComponentsImportsRazorFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToRazorFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_ImportsRazorFile_WebBlazorClient_Components(
+                    razorFilePath,
+                    projectNamespaceName);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        public Func<IProjectContext, Task> Create_ComponentsLayoutsImportsRazorFile(
+            INamespaceName projectNamespaceName)
+        {
+            return projectContext =>
+            {
+                var razorFilePath = Instances.ProjectPathsOperator.Get_ComponentsLayoutsImportsRazorFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToRazorFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_ImportsRazorFile_WebBlazorClient_ComponentsLayouts(
                     razorFilePath,
                     projectNamespaceName);
 
@@ -155,6 +240,25 @@ namespace R5T.L0040.O001
                     .ToHtmlFilePath();
 
                 Instances.CodeFileGenerationOperations.Create_IndexHtmlFile(
+                    htmlFilePath,
+                    projectContext.ProjectName.Value);
+
+                return Task.CompletedTask;
+            };
+        }
+
+        /// <summary>
+        /// Uses the project name as the index page title.
+        /// </summary>
+        public Func<IProjectContext, Task> Create_IndexHtmlFile_WebBlazorClient()
+        {
+            return projectContext =>
+            {
+                var htmlFilePath = Instances.ProjectPathsOperator.GetWwwRootIndexHtmlFilePath(
+                    projectContext.ProjectFilePath.Value)
+                    .ToHtmlFilePath();
+
+                Instances.CodeFileGenerationOperations.Create_IndexHtmlFile_WebBlazorClient(
                     htmlFilePath,
                     projectContext.ProjectName.Value);
 
@@ -224,19 +328,18 @@ namespace R5T.L0040.O001
         }
 
         public Func<IProjectContext, Task> Create_PackageJsonFile(
-            IProjectName projectName,
             IProjectDescription projectDescription,
             INamespaceName projectNamespaceName)
         {
-            return projectContext =>
+            return context =>
             {
                 var jsonFilePath = Instances.ProjectPathsOperator.GetPackageJsonFilePath(
-                    projectContext.ProjectFilePath.Value)
+                    context.ProjectFilePath.Value)
                     .ToJsonFilePath();
 
                 Instances.CodeFileGenerationOperations.Create_PackageJsonFile(
                     jsonFilePath,
-                    projectName,
+                    context.ProjectName,
                     projectDescription);
 
                 return Task.CompletedTask;
@@ -295,7 +398,6 @@ namespace R5T.L0040.O001
         }
 
         public Func<IProjectContext, Task> Create_ProjectPlanFile(
-           IProjectName projectName,
            IProjectDescription projectDescription)
         {
             return context =>
@@ -306,7 +408,7 @@ namespace R5T.L0040.O001
 
                 Instances.CodeFileGenerationOperations.Create_ProjectPlanFile_Markdown(
                     projectPlanFilePath,
-                    projectName,
+                    context.ProjectName,
                     projectDescription);
 
                 return Task.CompletedTask;
