@@ -145,7 +145,7 @@ namespace R5T.L0040
             ISolutionContext solutionContext,
             Func<IProjectFileContext, Task> setupProjectFileOperation,
             Func<IProjectContext, Task> setupProjectOperation,
-            IHasProjectFilePath hasProjectFilePath)
+            IWithProjectFilePath withProjectFilePath)
         {
             return this.Create_New_Project(
                 solutionContext,
@@ -153,7 +153,7 @@ namespace R5T.L0040
                 setupProjectOperation,
                 projectFilePath =>
                 {
-                    hasProjectFilePath.ProjectFilePath = projectFilePath;
+                    withProjectFilePath.ProjectFilePath = projectFilePath;
 
                     return Task.CompletedTask;
                 });
@@ -185,7 +185,7 @@ namespace R5T.L0040
         public Func<IProjectContext, Task> Create_New_Project(
             Func<IProjectFileContext, Task> setupProjectFileOperation,
             Func<IProjectContext, Task> setupProjectOperation,
-            IHasProjectFilePath hasProjectFilePath)
+            IWithProjectFilePath withProjectFilePath)
         {
             return projectContext => projectContext.Run(
                 // Create the project file.
@@ -194,7 +194,7 @@ namespace R5T.L0040
                 // Handle the project file path.
                 projectContext =>
                 {
-                    hasProjectFilePath.ProjectFilePath = projectContext.ProjectFilePath;
+                    withProjectFilePath.ProjectFilePath = projectContext.ProjectFilePath;
 
                     return Task.CompletedTask;
                 },
@@ -319,11 +319,11 @@ namespace R5T.L0040
             };
         }
 
-        public Func<IProjectContext, Task> Set_ProjectFilePath(IHasProjectFilePath hasProjectFilePath)
+        public Func<IProjectContext, Task> Set_ProjectFilePath(IWithProjectFilePath withProjectFilePath)
         {
             return context =>
             {
-                hasProjectFilePath.ProjectFilePath = context.ProjectFilePath;
+                withProjectFilePath.ProjectFilePath = context.ProjectFilePath;
 
                 return Task.CompletedTask;
             };
