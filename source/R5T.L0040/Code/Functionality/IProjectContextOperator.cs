@@ -27,7 +27,7 @@ namespace R5T.L0040
             ITextOutput textOutput,
             params Func<IProjectContext, Task>[] operations)
         {
-            Instances.FileSystemOperator.VerifyFileDoesNotExists(projectFilePath.Value);
+            Instances.FileSystemOperator.Verify_File_DoesNotExist(projectFilePath.Value);
 
             return this.In_ProjectContext(
                 projectFilePath,
@@ -62,7 +62,7 @@ namespace R5T.L0040
             ITextOutput textOutput,
             params Func<IProjectContext, Task>[] operations)
         {
-            Instances.FileSystemOperator.VerifyFileExists(projectFilePath.Value);
+            Instances.FileSystemOperator.Verify_File_Exists(projectFilePath.Value);
 
             return this.In_ProjectContext(
                 projectFilePath,
