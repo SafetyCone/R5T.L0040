@@ -130,7 +130,7 @@ namespace R5T.L0040.Internal
                     projectDescription,
                     projectNamespaceName),
                 Instances.ProjectContextOperations.Add_ProjectFileReferences(
-                    Instances.ProjectFileReferences.For_NET_6_FoundationLibrary)
+                    Instances.ProjectFileReferences.For_NET_Standard_2_1_Library)
             );
         }
 
